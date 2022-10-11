@@ -16,7 +16,7 @@ export default class Ball {
         this.radius = radius;
     }
 
-    resolveCollision(other: Ball): boolean {
+    public resolveCollision(other: Ball): boolean {
         const posDiff = Vec2.diff(other.position, this.position);
         const radiusSum = this.radius + other.radius;
         const intersectLen = radiusSum - posDiff.len();
@@ -32,35 +32,46 @@ export default class Ball {
         return false;
     }
 
-    resistanceForce(): Vec2 {
+    public resistanceForce(): Vec2 {
         return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN);
     }
 
-    applyPushForce(f: Vec2) {
+    public applyPushForce(f: Vec2) {
         this.pushForce = f;
-
-        let finalForce = Vec2.diff(f, this.resistanceForce());
-        this.acceleration = Vec2.scaled(finalForce, 1 / this.mass);
     }
 
-    resetPushForce() {
+    public resetPushForce() {
         this.pushForce = Vec2.ZERO;
     }
 
-    impact(other: Ball) {
-        // this works properly only when the other ball is stationary
+    public momentum() {
+        return Vec2.scaled(this.velocity, this.mass);
+    }
+
+    public impact(impacted: Ball) {
         // doesn't account for elasicity factor
+        
+        const transferredMomentumToImpacted = this.transferredImpactMomentum(impacted);
+        const transferredMomentumToThis = impacted.transferredImpactMomentum(this);
+        
+        impacted.velocity = Vec2.sum(impacted.velocity, transferredMomentumToImpacted);
+        this.velocity = Vec2.diff(this.velocity, transferredMomentumToImpacted);
+        impacted.velocity = Vec2.diff(impacted.velocity, transferredMomentumToThis);
+        this.velocity = Vec2.sum(this.velocity, transferredMomentumToThis);
+    }
 
-        const dirToImpacted = Vec2.diff(other.position, this.position).normalized();
+    private transferredImpactMomentum(impacted: Ball): Vec2 {
+        const dirToImpacted = Vec2.diff(impacted.position, this.position).normalized();
         const angleOfAttackDotProd = Vec2.dot(this.velocity.normalized(), dirToImpacted);
-        const transferredMomentum = Vec2.scaled(dirToImpacted, angleOfAttackDotProd * this.velocity.len());
+        if(angleOfAttackDotProd > 0.0) {
+            return Vec2.scaled(dirToImpacted, angleOfAttackDotProd * this.velocity.len());
+        }
 
-        other.velocity = Vec2.sum(other.velocity, transferredMomentum);
-        this.velocity = Vec2.diff(this.velocity, transferredMomentum);
+        return Vec2.ZERO;
     }
 
 
-    update(dt: number) {
+    public update(dt: number) {
         let finalForce: Vec2;
         if(this.pushForce.len() >= this.resistanceForce().len()) {
             finalForce = Vec2.diff(this.pushForce, this.resistanceForce());
@@ -75,7 +86,7 @@ export default class Ball {
         this.position = Vec2.sum(this.position, Vec2.scaled(this.velocity, dt));
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    public draw(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
         ctx.fillStyle = "blue";

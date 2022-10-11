@@ -48,11 +48,15 @@ export default class Ball {
     }
 
     impact(other: Ball) {
-        // const dir = Vec2.diff(other.position, this.position).normalized();
-        // const dot = Vec2.dot(this.velocity.normalized(), dir);
+        // this works properly only when the other ball is stationary
+        // doesn't account for elasicity factor
 
-        // other.velocity = this.velocity;
-        // this.velocity = Vec2.ZERO;
+        const dirToImpacted = Vec2.diff(other.position, this.position).normalized();
+        const angleOfAttackDotProd = Vec2.dot(this.velocity.normalized(), dirToImpacted);
+        const transferredMomentum = Vec2.scaled(dirToImpacted, angleOfAttackDotProd * this.velocity.len());
+
+        other.velocity = Vec2.sum(other.velocity, transferredMomentum);
+        this.velocity = Vec2.diff(this.velocity, transferredMomentum);
     }
 
 

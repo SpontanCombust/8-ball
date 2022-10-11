@@ -2,9 +2,15 @@ import Ball from "./Ball";
 import Vec2 from "./Vec2";
 
 const canvas: HTMLCanvasElement = document.getElementById("canvas")! as HTMLCanvasElement;
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!;
 
-const balls = [new Ball(new Vec2(100, 100), 50), new Ball(new Vec2(300, 100), 50)]
+const balls = [
+    new Ball(new Vec2(canvas.width / 2 - 200, canvas.height / 2), 50), 
+    new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2), 50)
+]
 
 const DELTA_TIME_SEC = 1.0 / 60.0;
 

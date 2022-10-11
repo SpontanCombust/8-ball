@@ -9,13 +9,28 @@
     <title>8-Ball</title>
   </head>
   <style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    li {
+      float: left;
+      padding: 5px;
+    }
     canvas {
       border: 3px solid black;
-      width: 98vw;
-      height: 95vh;
+      width: 90vw;
+      height: 90vh;
     }
   </style>
   <body>
+    <ul>
+      <li><button id="playScenario1Btn">Scenario 1</button></li>
+      <li><button id="playScenario2Btn">Scenario 2</button></li>
+      <li><button id="playScenario3Btn">Scenario 3</button></li>
+    </ul>
     <canvas id="canvas"></canvas>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="module" src="dist/index.js"></script>

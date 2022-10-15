@@ -129,7 +129,7 @@ export default class Ball {
         }
 
         this.acceleration = Vec2.scaled(finalForce, 1 / this.mass);
-        this.velocity = Vec2.sum(this.acceleration, this.velocity);
+        this.velocity = Vec2.sum(this.velocity, Vec2.scaled(this.acceleration, dt));
         this.position = Vec2.sum(this.position, Vec2.scaled(this.velocity, dt));
     }
 

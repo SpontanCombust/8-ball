@@ -18,7 +18,6 @@ canvas.height = canvas.offsetHeight;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!;
 
 const playTable = new PlayTable();
-const DELTA_TIME_SEC = 1.0 / 60.0;
 
 document.getElementById("playScenario1Btn")?.addEventListener("click", () => playDemoScenario1(playTable, canvas));
 document.getElementById("playScenario2Btn")?.addEventListener("click", () => playDemoScenario2(playTable, canvas));
@@ -29,27 +28,20 @@ document.getElementById("playScenario6Btn")?.addEventListener("click", () => pla
 document.getElementById("playScenario7Btn")?.addEventListener("click", () => playDemoScenario7(playTable, canvas));
 
 
-function gameLoop(): void {
+let lastTimestamp: number = 0;
+
+function gameLoop(timestamp: number): void {
+    const dt = (timestamp - lastTimestamp) / 1000.0;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    playTable.update(DELTA_TIME_SEC);
+    playTable.update(dt);
     playTable.draw(ctx);
+
+    lastTimestamp = timestamp;
+    window.requestAnimationFrame(gameLoop);
 }
 
-// function onMouseDown(pos: Vec2) {
-//     let f = Vec2.diff(pos, playTable.balls[0].position);
-//     f = Vec2.scaled(f, 1 / 100);
-//     playTable.balls[0].applyPushForce(f);
-// }
-
-// function onMouseUp(pos: Vec2) {
-//     playTable.balls[0].resetPushForce();
-// }
-
-// canvas.addEventListener("mousedown", (ev: MouseEvent) => onMouseDown(new Vec2(ev.x, ev.y)));
-// canvas.addEventListener("mouseup", (ev: MouseEvent) => onMouseUp(new Vec2(ev.x, ev.y)));
-//TODO add support for mobile
-
-setInterval(gameLoop, DELTA_TIME_SEC * 1000.0);
+window.requestAnimationFrame(gameLoop);
 
 export {};

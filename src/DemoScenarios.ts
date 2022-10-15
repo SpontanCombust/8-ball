@@ -8,7 +8,7 @@ export function playDemoScenario1(table: PlayTable, canvas: HTMLCanvasElement) {
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50)
     ];
 
-    table.balls[0].applyPushForce(new Vec2(15, 0));
+    table.balls[0].applyPushForce(new Vec2(300, 0));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();
@@ -21,7 +21,7 @@ export function playDemoScenario2(table: PlayTable, canvas: HTMLCanvasElement) {
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50)
     ];
 
-    table.balls[0].applyPushForce(new Vec2(20, 3));
+    table.balls[0].applyPushForce(new Vec2(400, -60));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();
@@ -34,7 +34,8 @@ export function playDemoScenario3(table: PlayTable, canvas: HTMLCanvasElement) {
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50)
     ];
 
-    table.balls[0].applyPushForce(new Vec2(20, -4.75));
+    table.balls[0].applyPushForce(new Vec2(300, 0));
+    table.balls[1].applyPushForce(new Vec2(60, 0));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();
@@ -47,8 +48,8 @@ export function playDemoScenario4(table: PlayTable, canvas: HTMLCanvasElement) {
         new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2), 50)
     ];
 
-    table.balls[0].applyPushForce(new Vec2(15, 0));
-    table.balls[1].applyPushForce(new Vec2(-15, 0));
+    table.balls[0].applyPushForce(new Vec2(300, 0));
+    table.balls[1].applyPushForce(new Vec2(-300, 0));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();
@@ -62,8 +63,8 @@ export function playDemoScenario5(table: PlayTable, canvas: HTMLCanvasElement) {
         new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2 + 200), 50)
     ];
 
-    table.balls[0].applyPushForce(new Vec2(20, 20));
-    table.balls[1].applyPushForce(new Vec2(-10, -10));
+    table.balls[0].applyPushForce(new Vec2(400, 400));
+    table.balls[1].applyPushForce(new Vec2(-200, -200));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();
@@ -74,11 +75,11 @@ export function playDemoScenario5(table: PlayTable, canvas: HTMLCanvasElement) {
 export function playDemoScenario6(table: PlayTable, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2 - 200), 50), 
-        new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2 - 50), 50)
+        new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2 - 170), 50)
     ];
 
-    table.balls[0].applyPushForce(new Vec2(20, 20));
-    table.balls[1].applyPushForce(new Vec2(-15, 15));
+    table.balls[0].applyPushForce(new Vec2(400, 400));
+    table.balls[1].applyPushForce(new Vec2(-300, 500));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();
@@ -88,15 +89,15 @@ export function playDemoScenario6(table: PlayTable, canvas: HTMLCanvasElement) {
 
 export function playDemoScenario7(table: PlayTable, canvas: HTMLCanvasElement) {
     table.balls = [
-        new Ball(new Vec2(canvas.width / 2 - 500, canvas.height / 2), 50), 
-        new Ball(new Vec2(canvas.width / 2 - 200, canvas.height / 2), 50), 
-        new Ball(new Vec2(canvas.width / 2 - 100, canvas.height / 2), 50), 
-        new Ball(new Vec2(canvas.width / 2 + 0, canvas.height / 2), 50),
-        new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50),
-        new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2), 50),
+        new Ball(new Vec2(canvas.width / 2 - 500, canvas.height / 2), 48), 
+        new Ball(new Vec2(canvas.width / 2 - 200, canvas.height / 2), 48), 
+        new Ball(new Vec2(canvas.width / 2 - 100, canvas.height / 2), 48), 
+        new Ball(new Vec2(canvas.width / 2 + 0, canvas.height / 2), 48),
+        new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 48),
+        new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2), 48),
     ];
 
-    table.balls[0].applyPushForce(new Vec2(20, 0));
+    table.balls[0].applyPushForce(new Vec2(400, 0));
 
     setTimeout(() => {
         table.balls[0].resetPushForce();

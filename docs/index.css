@@ -1,0 +1,6 @@
+/* docs/index.css */
+canvas {
+  border: 3px solid black;
+  width: 90vw;
+  height: 90vh;
+}

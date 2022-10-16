@@ -56,7 +56,7 @@ export default class Ball {
     }
 
     public impact(impacted: Ball) {
-        console.log(`BEFORE: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
+        // console.log(`BEFORE: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
 
         const dirToImpacted = Vec2.diff(impacted.position, this.position).normalized();
 
@@ -95,7 +95,7 @@ export default class Ball {
         this.velocity = Vec2.sum(this.velocity, distributedVelocity);
         impacted.velocity = Vec2.sum(impacted.velocity, Vec2.diff(totalTransferableVelocity, distributedVelocity));
         
-        console.log(`AFTER: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
+        // console.log(`AFTER: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
     }
 
     private velocityFromMomentum(momentum: Vec2): Vec2 {
@@ -104,7 +104,6 @@ export default class Ball {
 
     // Based on conservation of momentum and conservation of kinetic energy
     // Returns final velocity of 'this' in the direction axis
-    //TODO elasticity
     private computeImpactVelocityDistribution(impacted: Ball, thisTransferableVelocity: Vec2, impactedTransferableVelocity: Vec2): Vec2 {
         return Vec2.sum(
             Vec2.scaled(

@@ -1,8 +1,8 @@
-import Ball from "./Ball";
-import type PlayTable from "./PlayTable";
-import Vec2 from "./Vec2";
+import Ball from "../Ball";
+import type PoolGame from "../PoolGame";
+import Vec2 from "../Vec2";
 
-export function playDemoScenario1(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario1(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2), 50), 
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50)
@@ -15,7 +15,7 @@ export function playDemoScenario1(table: PlayTable, canvas: HTMLCanvasElement) {
     }, 1000);
 }
 
-export function playDemoScenario2(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario2(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2), 50), 
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50)
@@ -28,7 +28,7 @@ export function playDemoScenario2(table: PlayTable, canvas: HTMLCanvasElement) {
     }, 1000);
 }
 
-export function playDemoScenario3(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario3(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2), 50), 
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2), 50)
@@ -42,7 +42,7 @@ export function playDemoScenario3(table: PlayTable, canvas: HTMLCanvasElement) {
     }, 1000);
 }
 
-export function playDemoScenario4(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario4(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2), 50), 
         new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2), 50)
@@ -57,7 +57,7 @@ export function playDemoScenario4(table: PlayTable, canvas: HTMLCanvasElement) {
     }, 1000);
 }
 
-export function playDemoScenario5(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario5(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2 - 200), 50), 
         new Ball(new Vec2(canvas.width / 2 + 200, canvas.height / 2 + 200), 50)
@@ -72,7 +72,7 @@ export function playDemoScenario5(table: PlayTable, canvas: HTMLCanvasElement) {
     }, 1000);
 }
 
-export function playDemoScenario6(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario6(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 300, canvas.height / 2 - 200), 50), 
         new Ball(new Vec2(canvas.width / 2 + 100, canvas.height / 2 - 170), 50)
@@ -87,7 +87,7 @@ export function playDemoScenario6(table: PlayTable, canvas: HTMLCanvasElement) {
     }, 1000);
 }
 
-export function playDemoScenario7(table: PlayTable, canvas: HTMLCanvasElement) {
+export function playDemoScenario7(table: PoolGame, canvas: HTMLCanvasElement) {
     table.balls = [
         new Ball(new Vec2(canvas.width / 2 - 500, canvas.height / 2), 48), 
         new Ball(new Vec2(canvas.width / 2 - 200, canvas.height / 2), 48), 

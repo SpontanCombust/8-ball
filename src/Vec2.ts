@@ -19,7 +19,7 @@ export default class Vec2 {
     }
 
     public toString(): string {
-        return `[${this.x}, ${this.y}]`;
+        return `[${this.x.toFixed(4)}, ${this.y.toFixed(4)}]`;
     }
 
 

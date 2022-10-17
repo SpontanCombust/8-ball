@@ -1,3 +1,4 @@
+import type Line from "./Line";
 import Vec2 from "./Vec2";
 
 export default class Ball {
@@ -19,7 +20,18 @@ export default class Ball {
         this.elasticity = (elasticity != undefined) ? Math.min(Math.max(0.0, elasticity), 1.0) : 1.0;
     }
 
-    public resolveCollision(other: Ball): boolean {
+
+
+
+    public resolveCollision(collider: Ball | Line): boolean {
+        if(collider instanceof Ball) {
+            return this.resolveCollisionWithBall(collider);
+        } else {
+            return this.resolveCollisionWithWall(collider);
+        }
+    }
+
+    private resolveCollisionWithBall(other: Ball): boolean {
         const posDiff = Vec2.diff(other.position, this.position);
         const radiusSum = this.radius + other.radius;
         const intersectLen = radiusSum - posDiff.len();
@@ -35,6 +47,26 @@ export default class Ball {
         return false;
     }
 
+    private resolveCollisionWithWall(wall: Line): boolean {
+        const normal = wall.normalTo(this.position);
+        const possibleCollisionPoint = Vec2.diff(this.position, normal); // add a negative of normal vec
+        
+        if(normal.len() < this.radius) {
+            if(wall.contains(possibleCollisionPoint)
+                || Vec2.diff(this.position, wall.p1).len() < this.radius
+                || Vec2.diff(this.position, wall.p2).len() < this.radius) {
+
+                this.position = Vec2.sum(possibleCollisionPoint, Vec2.scaled(normal.normalized(), this.radius));
+                return true;
+            }
+        }
+        
+        return false;
+    } 
+
+
+
+
     public resistanceForce(): Vec2 {
         return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN);
     }
@@ -47,6 +79,9 @@ export default class Ball {
         this.pushForce = Vec2.ZERO;
     }
 
+
+
+
     public momentum(): Vec2 {
         return Vec2.scaled(this.velocity, this.mass);
     }
@@ -55,7 +90,15 @@ export default class Ball {
         return this.mass * this.velocity.len() * this.velocity.len() / 2; 
     }
 
-    public impact(impacted: Ball) {
+    public impact(impacted: Ball | Line) {
+        if(impacted instanceof Ball) {
+            this.impactWithBall(impacted);
+        } else {
+            this.impactWithWall(impacted);
+        }
+    }
+
+    private impactWithBall(impacted: Ball) {
         // console.log(`BEFORE: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
 
         const dirToImpacted = Vec2.diff(impacted.position, this.position).normalized();
@@ -98,6 +141,11 @@ export default class Ball {
         // console.log(`AFTER: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
     }
 
+    private impactWithWall(impacted: Line) {
+        const normal = impacted.normalTo(this.position);
+        this.velocity = this.velocity.reflected(normal.normalized());
+    }
+
     private velocityFromMomentum(momentum: Vec2): Vec2 {
         return Vec2.scaled(momentum, 1 / this.mass);
     }
@@ -116,6 +164,9 @@ export default class Ball {
             )
         );
     }
+
+
+
 
     public update(dt: number) {
         let finalForce: Vec2;

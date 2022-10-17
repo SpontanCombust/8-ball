@@ -18,6 +18,10 @@ export default class Vec2 {
         return new Vec2(isNaN(normX) ? 0.0 : normX, isNaN(normY) ? 0.0 : normY);
     }
 
+    public reflected(normal: Vec2): Vec2 {
+        return Vec2.diff(this, Vec2.scaled(normal.normalized(), 2 * Vec2.dot(normal.normalized(), this)));
+    }
+
     public toString(): string {
         return `[${this.x.toFixed(4)}, ${this.y.toFixed(4)}]`;
     }

@@ -1,5 +1,14 @@
 import PoolGame from "../PoolGame";
-import { playDemoScenario1, playDemoScenario2, playDemoScenario3, playDemoScenario4, playDemoScenario5, playDemoScenario6, playDemoScenario7 } from "./DemoScenarios";
+import { 
+    playDemoScenario1, 
+    playDemoScenario2, 
+    playDemoScenario3, 
+    playDemoScenario4, 
+    playDemoScenario5, 
+    playDemoScenario6, 
+    playDemoScenario7, 
+    playDemoScenario8
+} from "./DemoScenarios";
 
 export default class PhysicsDemoPoolGame extends PoolGame {
     private style = `
@@ -23,7 +32,8 @@ export default class PhysicsDemoPoolGame extends PoolGame {
         playDemoScenario4,
         playDemoScenario5,
         playDemoScenario6,
-        playDemoScenario7
+        playDemoScenario7,
+        playDemoScenario8,
     ];
 
     constructor(canvas: HTMLCanvasElement) {

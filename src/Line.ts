@@ -16,8 +16,15 @@ export default class Line {
         this.b = this.p1.y - this.a * this.p1.x;
     }
 
+    
+    
+    private isPerfectlyHorizontal(): boolean {
+        return Math.abs(this.p1.y - this.p2.y) < 0.00001;
+    }
 
-
+    private isPerfectlyVertical(): boolean {
+        return Math.abs(this.p1.x - this.p2.x) < 0.00001;
+    }
 
     // Tests whether point p can be placed on this line
     public contains(p: Vec2): boolean {
@@ -30,6 +37,13 @@ export default class Line {
         }
 
         if(numberInRange(p.x, this.p1.x, this.p2.x) && numberInRange(p.y, this.p1.y, this.p2.y)) {
+            // if it's perfectly pararrel to one of the axis there is no need to check ranges further
+            // we also prevent doing calculations with Infinite value, which would be the case
+            // with perfectly vertical line ('a' coefficient is Infinite) 
+            if(this.isPerfectlyVertical() || this.isPerfectlyHorizontal()) {
+                return true;
+            }
+
             const y = this.a * p.x + this.b;
     
             return Math.abs(y - p.y) < 0.00001;
@@ -40,11 +54,10 @@ export default class Line {
 
     // Returns a non-unit normal vector of this (unbound) line, going through p0
     public normalTo(p0: Vec2): Vec2 {
-        // special case for perfectly horizontal line
-        if(Math.abs(this.p1.x - this.p2.x) < 0.00001) {
+        if(this.isPerfectlyVertical()) {
             return new Vec2(p0.x - this.p1.x, 0);
         }
-        else if(Math.abs(this.p1.y - this.p2.y) < 0.00001) {
+        else if(this.isPerfectlyHorizontal()) {
             return new Vec2(0, p0.y - this.p1.y);
         }
         

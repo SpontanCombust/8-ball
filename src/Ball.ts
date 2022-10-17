@@ -2,22 +2,20 @@ import type Line from "./Line";
 import Vec2 from "./Vec2";
 
 export default class Ball {
-    public static RESISTANCE_FORCE_MAGN = 0.5;
+    public static RESISTANCE_FORCE_MAGN = 50;
 
     public position: Vec2;
     public radius: number;
     public mass: number;
-    public elasticity: number;
     
     public pushForce: Vec2 = new Vec2();
     public acceleration: Vec2 = new Vec2();
     public velocity: Vec2 = new Vec2();
     
-    constructor(position: Vec2, radius: number, mass?: number, elasticity?: number) {
+    constructor(position: Vec2, radius: number, mass?: number) {
         this.position = position;
         this.radius = radius;
         this.mass = (mass != undefined) ? mass : 1.0;
-        this.elasticity = (elasticity != undefined) ? Math.min(Math.max(0.0, elasticity), 1.0) : 1.0;
     }
 
 

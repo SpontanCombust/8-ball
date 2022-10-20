@@ -76,7 +76,7 @@ export default class Line {
 
 
 
-
+    // For debugging purposes
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.moveTo(this.p1.x, this.p1.y);

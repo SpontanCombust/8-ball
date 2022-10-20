@@ -1,5 +1,6 @@
 canvas {
-    border: 3px solid black;
-    width: 90vw;
-    height: 90vh;
+    border: 1px solid black;
+    width: 95vw;
+    height: 95vh;
+    margin-left: 2vw;
 }

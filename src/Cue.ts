@@ -4,11 +4,11 @@ import Vec2 from "./Vec2";
 
 export default class Cue {
     private static MAX_OFFSET_FROM_TARGET = 200;
-    private static STRENGH_MULTIPLIER = 500;
+    private static STRENGH_MULTIPLIER = 1000;
 
     public target: Ball | null = null;
     private mousePos = new Vec2();
-    private strength = 0.0;
+    private strength = 0.5;
 
     constructor(canvas: HTMLCanvasElement) {
         this.setupCanvasObserver(canvas);
@@ -23,10 +23,16 @@ export default class Cue {
         canvas.addEventListener("wheel", (ev) => {
             this.strength = clamp(this.strength - ev.deltaY / 100, 0.0, 1.0);
         });
+
+        canvas.addEventListener("click", (ev) => {
+            if(ev.button == 0) {
+                this.hitTarget();
+            }
+        });
     }
 
     public isAvailable(): boolean {
-        return this.target != null && this.target.velocity.len() < 0.0001;
+        return this.target != null && this.target.velocity.len() < 0.01;
     }
 
     private directionFromTarget(): Vec2 {

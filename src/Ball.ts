@@ -3,6 +3,7 @@ import Vec2 from "./Vec2";
 
 export default class Ball {
     public static RESISTANCE_FORCE_MAGN = 50;
+    public static WALL_VELOCITY_ABSORPTION_FACTOR = 0.1;
 
     public position: Vec2;
     public radius: number;
@@ -24,7 +25,18 @@ export default class Ball {
 
 
     public resistanceForce(): Vec2 {
-        return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN);
+        const HALT_VELOCITY_THRESHOLD = 10; 
+
+        let resistanceMultip = 1.0;
+        if(this.velocity.len() < HALT_VELOCITY_THRESHOLD) {
+            //HACK that causes the velocity to not overflow from the resistance force
+            // under the threshold resistance lessens and in consequence the deceleration
+            // too much deceleration would cause the velocity to go in the opposite direction
+            // with this simple dynamics setup in update()
+            resistanceMultip = this.velocity.len() / HALT_VELOCITY_THRESHOLD; 
+        }
+
+        return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN * resistanceMultip);
     }
 
     public momentum(): Vec2 {
@@ -135,7 +147,8 @@ export default class Ball {
 
     private impactWithWall(impacted: Line) {
         const normal = impacted.normalTo(this.position);
-        this.velocity = this.velocity.reflected(normal.normalized());
+        // DISCUSS absorption should probably be done only to the velocity component parallel to wall's normal
+        this.velocity = Vec2.scaled(this.velocity.reflected(normal.normalized()), 1.0 - Ball.WALL_VELOCITY_ABSORPTION_FACTOR);
     }
 
     private velocityFromMomentum(momentum: Vec2): Vec2 {

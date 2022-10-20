@@ -1,4 +1,4 @@
-import type Ball from "./Ball";
+import Ball from "./Ball";
 import Game from "./Game";
 import Line from "./Line";
 import { roundRect } from "./Utils";
@@ -56,9 +56,32 @@ export default class PoolGame extends Game {
     }
 
     private resetBallFormation() {
-        // TODO implement
-        // Should fill this.balls array with balls in the triangle formation on the table,
-        // position the white ball and the cue to it.
+        this.balls = [
+            // TODO allow the player to choose the position of the white ball
+            // draw vertical line at 1/4th of the width
+            new Ball(new Vec2(525, 520), 20, 0),
+            
+
+            new Ball(new Vec2(1275, 520), 20, 1),
+
+            new Ball(new Vec2(1310, 500), 20, 2),
+            new Ball(new Vec2(1310, 540), 20, 3),
+
+            new Ball(new Vec2(1345, 480), 20, 4),
+            new Ball(new Vec2(1345, 520), 20, 5),
+            new Ball(new Vec2(1345, 560), 20, 6),
+
+            new Ball(new Vec2(1380, 460), 20, 7),
+            new Ball(new Vec2(1380, 500), 20, 8),
+            new Ball(new Vec2(1380, 540), 20, 9),
+            new Ball(new Vec2(1380, 580), 20, 10),
+
+            new Ball(new Vec2(1415, 440), 20, 11),
+            new Ball(new Vec2(1415, 480), 20, 12),
+            new Ball(new Vec2(1415, 520), 20, 13),
+            new Ball(new Vec2(1415, 560), 20, 14),
+            new Ball(new Vec2(1415, 600), 20, 15),
+        ];
     }
 
     private resetPlayerScore() {

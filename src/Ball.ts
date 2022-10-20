@@ -6,16 +6,33 @@ export default class Ball {
 
     public position: Vec2;
     public radius: number;
+    public lookVariant: number;
     public mass: number;
     
     public pushForce: Vec2 = new Vec2();
     public acceleration: Vec2 = new Vec2();
     public velocity: Vec2 = new Vec2();
     
-    constructor(position: Vec2, radius: number, mass?: number) {
+    constructor(position: Vec2, radius: number, lookVariant?: number, mass?: number) {
         this.position = position;
         this.radius = radius;
+        this.lookVariant = (lookVariant != undefined) ? lookVariant : 0;
         this.mass = (mass != undefined) ? mass : 1.0;
+    }
+
+
+
+
+    public resistanceForce(): Vec2 {
+        return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN);
+    }
+
+    public momentum(): Vec2 {
+        return Vec2.scaled(this.velocity, this.mass);
+    }
+
+    public kineticEnergy(): number {
+        return this.mass * this.velocity.len() * this.velocity.len() / 2; 
     }
 
 
@@ -64,30 +81,7 @@ export default class Ball {
 
 
 
-
-    public resistanceForce(): Vec2 {
-        return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN);
-    }
-
-    public applyPushForce(f: Vec2) {
-        this.pushForce = f;
-    }
-
-    public resetPushForce() {
-        this.pushForce = Vec2.ZERO;
-    }
-
-
-
-
-    public momentum(): Vec2 {
-        return Vec2.scaled(this.velocity, this.mass);
-    }
-
-    public kineticEnergy(): number {
-        return this.mass * this.velocity.len() * this.velocity.len() / 2; 
-    }
-
+    
     public impact(impacted: Ball | Line) {
         if(impacted instanceof Ball) {
             this.impactWithBall(impacted);
@@ -181,12 +175,122 @@ export default class Ball {
         this.position = Vec2.sum(this.position, Vec2.scaled(this.velocity, dt));
     }
 
+
+
+
     public draw(ctx: CanvasRenderingContext2D) {
+        switch(this.lookVariant) {
+        case 1:
+            this.drawSolid(ctx, "yellow");
+            break;
+        case 2:
+            this.drawSolid(ctx, "blue");
+            break;
+        case 3:
+            this.drawSolid(ctx, "red");
+            break;
+        case 4:
+            this.drawSolid(ctx, "purple");
+            break;
+        case 5:
+            this.drawSolid(ctx, "orange");
+            break;
+        case 6:
+            this.drawSolid(ctx, "green");
+            break;
+        case 7:
+            this.drawSolid(ctx, "brown");
+            break;
+        case 8:
+            this.drawSolid(ctx, "black");
+            break;
+        case 9:
+            this.drawStriped(ctx, "yellow");
+            break;
+        case 10:
+            this.drawStriped(ctx, "blue");
+            break;
+        case 11:
+            this.drawStriped(ctx, "red");
+            break;
+        case 12:
+            this.drawStriped(ctx, "purple");
+            break;
+        case 13:
+            this.drawStriped(ctx, "orange");
+            break;
+        case 14:
+            this.drawStriped(ctx, "green");
+            break;
+        case 15:
+            this.drawStriped(ctx, "brown");
+            break;
+        default:
+            this.drawWhite(ctx);
+        }
+    }
+
+    private drawWhite(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "white";
         ctx.fill();
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1;
         ctx.stroke();
     }
+
+    private drawSolid(ctx: CanvasRenderingContext2D, color: string) {
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius * 0.5, 0, Math.PI * 2, false);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "17px serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.lookVariant.toString(), this.position.x, this.position.y + 5);
+    }
+
+    private drawStriped(ctx: CanvasRenderingContext2D, color: string) {
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius, Math.PI * 0.25, Math.PI * 1.75, true);
+        ctx.arc(this.position.x, this.position.y, this.radius, Math.PI * 1.25, Math.PI * 0.75, true);
+        // have to repeat so that stroke is drawn on the bottom too
+        ctx.arc(this.position.x, this.position.y, this.radius, Math.PI * 0.25, Math.PI * 1.75, true); 
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius * 0.5, 0, Math.PI * 2, false);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "17px serif"
+        ctx.textAlign = "center";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.lookVariant.toString(), this.position.x, this.position.y + 5);
+    }
+
 }

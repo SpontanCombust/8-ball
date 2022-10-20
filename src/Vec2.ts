@@ -11,6 +11,10 @@ export default class Vec2 {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
+    public negated(): Vec2 {
+        return new Vec2(-this.x, -this.y);
+    }
+
     public normalized(): Vec2 {
         const len = this.len();
         const normX = this.x / len;

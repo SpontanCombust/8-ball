@@ -7,7 +7,7 @@ export function roundRect(
     radius = 5,
     fill = false,
     stroke = true
-  ) {
+) {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
     ctx.lineTo(x + width - radius, y);
@@ -20,9 +20,13 @@ export function roundRect(
     ctx.quadraticCurveTo(x, y, x + radius, y);
     ctx.closePath();
     if (fill) {
-      ctx.fill();
+        ctx.fill();
     }
     if (stroke) {
-      ctx.stroke();
+        ctx.stroke();
     }
+}
+    
+export function clamp(x: number, min: number, max: number) {
+    return Math.min(Math.max(x, min), max);
 }

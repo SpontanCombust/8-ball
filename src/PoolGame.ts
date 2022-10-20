@@ -1,4 +1,5 @@
 import Ball from "./Ball";
+import Cue from "./Cue";
 import Game from "./Game";
 import Line from "./Line";
 import { roundRect } from "./Utils";
@@ -7,9 +8,11 @@ import Vec2 from "./Vec2";
 export default class PoolGame extends Game {
     public balls: Ball[] = [];
     public walls: Line[] = [];
+    public cue: Cue;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
+        this.cue = new Cue(this.canvas);
 
         this.setupWallColliders();
         this.setupPockets();
@@ -82,6 +85,8 @@ export default class PoolGame extends Game {
             new Ball(new Vec2(1415, 560), 20, 14),
             new Ball(new Vec2(1415, 600), 20, 15),
         ];
+
+        this.cue.target = this.balls[0];
     }
 
     private resetPlayerScore() {
@@ -125,6 +130,7 @@ export default class PoolGame extends Game {
         // brown outer border
         this.ctx.fillStyle = "brown";
         this.ctx.strokeStyle = "black";
+        this.ctx.lineWidth = 5;
         roundRect(this.ctx, 100, 120, 1600, 800, 50, true);
 
 
@@ -184,6 +190,8 @@ export default class PoolGame extends Game {
         for(const ball of this.balls) {
             ball.draw(this.ctx);
         }
+
+        this.cue.draw(this.ctx);
 
         // Uncomment to see wall colliders
         // for(const wall of this.walls) {

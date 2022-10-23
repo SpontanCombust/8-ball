@@ -2,13 +2,19 @@ import Ball from "./Ball";
 import Cue from "./Cue";
 import Game from "./Game";
 import Line from "./Line";
+import Pocket from "./Pocket";
 import { roundRect } from "./Utils";
 import Vec2 from "./Vec2";
 
 export default class PoolGame extends Game {
     public balls: Ball[] = [];
     public walls: Line[] = [];
+    public pockets: Pocket[] = [];
     public cue: Cue;
+    
+    public caughtBallsP1: Ball[] = [];
+    public caughtBallsP2: Ball[] = [];
+
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -46,8 +52,14 @@ export default class PoolGame extends Game {
     }
 
     private setupPockets() {
-        // TODO implement
-        // Fill this.pockets array
+        this.pockets = [
+            new Pocket(new Vec2(150, 170), 40),
+            new Pocket(new Vec2(900, 160), 35),
+            new Pocket(new Vec2(1650, 170), 40),
+            new Pocket(new Vec2(150, 870), 40),
+            new Pocket(new Vec2(900, 880), 35),
+            new Pocket(new Vec2(1650, 870), 40),
+        ];
     }
 
 
@@ -90,7 +102,8 @@ export default class PoolGame extends Game {
     }
 
     private resetPlayerScore() {
-        // TODO implement
+        this.caughtBallsP1 = [];
+        this.caughtBallsP2 = [];
     }
 
 
@@ -111,6 +124,16 @@ export default class PoolGame extends Game {
             for (let k = i + 1; k < this.balls.length; k++) {
                 if(this.balls[i].resolveCollision(this.balls[k])) {
                     this.balls[i].impact(this.balls[k]);
+                }
+            }
+
+            for(let p = 0; p < this.pockets.length; p++) {
+                if(this.pockets[p].isBallCaptured(this.balls[i])) {
+                    //FIXME for now they're pushed only to one array
+                    this.caughtBallsP1.push(this.balls[i]);
+                    this.balls.splice(i, 1);
+                    i -= 1; // so the balls loop stays at the same index in the next iteration
+                    break;
                 }
             }
         }
@@ -141,32 +164,9 @@ export default class PoolGame extends Game {
 
 
         // pockets
-        this.ctx.fillStyle = "black";
-
-        this.ctx.beginPath();
-        this.ctx.arc(150, 170, 40, 0, 2 * Math.PI);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(900, 160, 35, 0, 2 * Math.PI);
-        this.ctx.fill();
-
-        this.ctx.beginPath();
-        this.ctx.arc(1650, 170, 40, 0, 2 * Math.PI);
-        this.ctx.fill();
-
-        this.ctx.beginPath();
-        this.ctx.arc(150, 870, 40, 0, 2 * Math.PI);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(900, 880, 35, 0, 2 * Math.PI);
-        this.ctx.fill();
-
-        this.ctx.beginPath();
-        this.ctx.arc(1650, 870, 40, 0, 2 * Math.PI);
-        this.ctx.fill();
-
+        for(let pocket of this.pockets) {
+            pocket.draw(this.ctx);
+        }
 
 
         // walls

@@ -103,6 +103,7 @@ export default class Ball {
     }
 
     private impactWithBall(impacted: Ball) {
+        //TODO make balls less bouncy
         // console.log(`BEFORE: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
 
         const dirToImpacted = Vec2.diff(impacted.position, this.position).normalized();

@@ -273,6 +273,7 @@ export default class Ball {
         ctx.font = "17px serif";
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
+        ctx.textBaseline = "alphabetic";
         ctx.fillText(this.lookVariant.toString(), this.position.x, this.position.y + 5);
     }
 
@@ -304,6 +305,7 @@ export default class Ball {
         ctx.font = "17px serif"
         ctx.textAlign = "center";
         ctx.fillStyle = "black";
+        ctx.textBaseline = "alphabetic";
         ctx.fillText(this.lookVariant.toString(), this.position.x, this.position.y + 5);
     }
 

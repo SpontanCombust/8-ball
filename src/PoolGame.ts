@@ -7,11 +7,15 @@ import { roundRect } from "./Utils";
 import Vec2 from "./Vec2";
 
 export default class PoolGame extends Game {
+    public static BALL_RADIUS = 20;
+
     public balls: Ball[] = [];
+    public whiteBall: Ball | null = null;
     public walls: Line[] = [];
     public pockets: Pocket[] = [];
     public cue: Cue;
     
+    public currentPlayer: 1 | 2 = 1;
     public caughtBallsP1: Ball[] = [];
     public caughtBallsP2: Ball[] = [];
 
@@ -74,30 +78,31 @@ export default class PoolGame extends Game {
         this.balls = [
             // TODO allow the player to choose the position of the white ball
             // draw vertical line at 1/4th of the width
-            new Ball(new Vec2(525, 520), 20, 0),
+            new Ball(new Vec2(525, 520), PoolGame.BALL_RADIUS, 0),
             
 
-            new Ball(new Vec2(1275, 520), 20, 1),
+            new Ball(new Vec2(1275, 520), PoolGame.BALL_RADIUS, 1),
 
-            new Ball(new Vec2(1310, 500), 20, 2),
-            new Ball(new Vec2(1310, 540), 20, 3),
+            new Ball(new Vec2(1310, 500), PoolGame.BALL_RADIUS, 2),
+            new Ball(new Vec2(1310, 540), PoolGame.BALL_RADIUS, 3),
 
-            new Ball(new Vec2(1345, 480), 20, 4),
-            new Ball(new Vec2(1345, 520), 20, 5),
-            new Ball(new Vec2(1345, 560), 20, 6),
+            new Ball(new Vec2(1345, 480), PoolGame.BALL_RADIUS, 4),
+            new Ball(new Vec2(1345, 520), PoolGame.BALL_RADIUS, 5),
+            new Ball(new Vec2(1345, 560), PoolGame.BALL_RADIUS, 6),
 
-            new Ball(new Vec2(1380, 460), 20, 7),
-            new Ball(new Vec2(1380, 500), 20, 8),
-            new Ball(new Vec2(1380, 540), 20, 9),
-            new Ball(new Vec2(1380, 580), 20, 10),
+            new Ball(new Vec2(1380, 460), PoolGame.BALL_RADIUS, 7),
+            new Ball(new Vec2(1380, 500), PoolGame.BALL_RADIUS, 8),
+            new Ball(new Vec2(1380, 540), PoolGame.BALL_RADIUS, 9),
+            new Ball(new Vec2(1380, 580), PoolGame.BALL_RADIUS, 10),
 
-            new Ball(new Vec2(1415, 440), 20, 11),
-            new Ball(new Vec2(1415, 480), 20, 12),
-            new Ball(new Vec2(1415, 520), 20, 13),
-            new Ball(new Vec2(1415, 560), 20, 14),
-            new Ball(new Vec2(1415, 600), 20, 15),
+            new Ball(new Vec2(1415, 440), PoolGame.BALL_RADIUS, 11),
+            new Ball(new Vec2(1415, 480), PoolGame.BALL_RADIUS, 12),
+            new Ball(new Vec2(1415, 520), PoolGame.BALL_RADIUS, 13),
+            new Ball(new Vec2(1415, 560), PoolGame.BALL_RADIUS, 14),
+            new Ball(new Vec2(1415, 600), PoolGame.BALL_RADIUS, 15),
         ];
 
+        this.whiteBall = this.balls[0];
         this.cue.target = this.balls[0];
     }
 
@@ -129,8 +134,12 @@ export default class PoolGame extends Game {
 
             for(let p = 0; p < this.pockets.length; p++) {
                 if(this.pockets[p].isBallCaptured(this.balls[i])) {
-                    //FIXME for now they're pushed only to one array
-                    this.caughtBallsP1.push(this.balls[i]);
+                    if(this.currentPlayer == 1) {
+                        this.caughtBallsP1.push(this.balls[i]);
+                    } else {
+                        this.caughtBallsP2.push(this.balls[i]);
+                    }
+                    
                     this.balls.splice(i, 1);
                     i -= 1; // so the balls loop stays at the same index in the next iteration
                     break;
@@ -143,10 +152,46 @@ export default class PoolGame extends Game {
 
 
     private drawPlayerScoresPanel() {
-        //TODO implement
-        // Draw panel which is split in half.
-        // In each half on top there's either "Player 1" or "Player 2"
-        // and under the name there is a row of balls currently scored by said player.
+        this.ctx.fillStyle = "black";
+        this.ctx.font = '30px arial';
+        this.ctx.textBaseline = 'bottom';
+
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText("Player 1", 850, 50);
+
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText("Player 2", 950, 50);
+
+        for(let i = 0; i < 7; i++) {
+            let ballPos: Vec2;
+
+            const drawEmpty = () => {
+                this.ctx.beginPath();
+                this.ctx.arc(ballPos.x, ballPos.y, PoolGame.BALL_RADIUS, 0, Math.PI * 2, false);
+                this.ctx.fillStyle = "black";
+                this.ctx.fill();
+            }
+
+
+            ballPos = new Vec2(570 + i * (2 * PoolGame.BALL_RADIUS + 5), 80);
+
+            if(i < this.caughtBallsP1.length) {
+                this.caughtBallsP1[i].position = ballPos;
+                this.caughtBallsP1[i].draw(this.ctx);
+            } else {
+                drawEmpty();
+            }
+
+
+            ballPos = new Vec2(960 + i * (2 * PoolGame.BALL_RADIUS + 5), 80);
+
+            if(i < this.caughtBallsP2.length) {
+                this.caughtBallsP1[i].position = ballPos;
+                this.caughtBallsP1[i].draw(this.ctx);
+            } else {
+                drawEmpty();
+            }
+        }
     }
 
     private drawTable() {
@@ -191,7 +236,9 @@ export default class PoolGame extends Game {
             ball.draw(this.ctx);
         }
 
-        this.cue.draw(this.ctx);
+        if(this.cue.enabled) {
+            this.cue.draw(this.ctx);
+        }
 
         // Uncomment to see wall colliders
         // for(const wall of this.walls) {

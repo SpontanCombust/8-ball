@@ -6,7 +6,9 @@ export default class Cue {
     private static MAX_OFFSET_FROM_TARGET = 200;
     private static STRENGH_MULTIPLIER = 1000;
 
+    public enabled = true;
     public target: Ball | null = null;
+
     private mousePos = new Vec2();
     private strength = 0.5;
 
@@ -31,8 +33,12 @@ export default class Cue {
         });
     }
 
-    public isAvailable(): boolean {
-        return this.target != null && this.target.velocity.len() < 0.01;
+    public isTargetMoving(): boolean {
+        if(this.target != null) {
+            return this.target.velocity.len() < 0.01;
+        }
+
+        return false;
     }
 
     private directionFromTarget(): Vec2 {
@@ -44,7 +50,7 @@ export default class Cue {
     }
 
     public hitTarget() {
-        if(this.isAvailable()) {
+        if(this.enabled) {
             this.target!.velocity = Vec2.scaled(
                 this.directionFromTarget().negated(),
                 this.getHitStrengh()
@@ -56,7 +62,7 @@ export default class Cue {
 
 
     public draw(ctx: CanvasRenderingContext2D) {
-        if(this.isAvailable()) {
+        if(this.enabled) {
             const dir = this.directionFromTarget();
             let offset = Vec2.scaled(dir, this.target!.radius + this.strength * Cue.MAX_OFFSET_FROM_TARGET);
 

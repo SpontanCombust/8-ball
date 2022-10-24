@@ -6,7 +6,7 @@ export default class Cue {
     private static MAX_OFFSET_FROM_TARGET = 200;
     private static STRENGH_MULTIPLIER = 1000;
 
-    public enabled = true;
+    public enabled = false;
     public target: Ball | null = null;
 
     private mousePos = new Vec2();
@@ -33,16 +33,12 @@ export default class Cue {
         });
     }
 
-    public isTargetMoving(): boolean {
-        if(this.target != null) {
-            return this.target.velocity.len() < 0.01;
+    private directionFromTarget(): Vec2 {
+        if(this.target && this.enabled) {
+            return Vec2.diff(this.mousePos, this.target.position).normalized();
         }
 
-        return false;
-    }
-
-    private directionFromTarget(): Vec2 {
-        return Vec2.diff(this.mousePos, this.target!.position).normalized();
+        return Vec2.ZERO;
     }
 
     public getHitStrengh(): number {
@@ -50,8 +46,8 @@ export default class Cue {
     }
 
     public hitTarget() {
-        if(this.enabled) {
-            this.target!.velocity = Vec2.scaled(
+        if(this.target && this.enabled) {
+            this.target.velocity = Vec2.scaled(
                 this.directionFromTarget().negated(),
                 this.getHitStrengh()
             );
@@ -62,23 +58,23 @@ export default class Cue {
 
 
     public draw(ctx: CanvasRenderingContext2D) {
-        if(this.enabled) {
+        if(this.target && this.enabled) {
             const dir = this.directionFromTarget();
-            let offset = Vec2.scaled(dir, this.target!.radius + this.strength * Cue.MAX_OFFSET_FROM_TARGET);
-
+            let offset = Vec2.scaled(dir, this.target.radius + this.strength * Cue.MAX_OFFSET_FROM_TARGET);
+    
             const lineToRelative = (from: number, to: number) => {
                 const fromPos = Vec2.sum(this.target!.position, Vec2.scaled(dir, offset.len() + from));
                 const toPos = Vec2.sum(this.target!.position, Vec2.scaled(dir, offset.len() + to));
                 ctx.moveTo(fromPos.x, fromPos.y);
                 ctx.lineTo(toPos.x, toPos.y);
             }
-
+    
             ctx.beginPath();
             ctx.lineWidth = 10;
             lineToRelative(0, 10);
             ctx.strokeStyle = "black";
             ctx.stroke();
-
+    
             ctx.beginPath();
             lineToRelative(10, 60);
             ctx.strokeStyle = "white";

@@ -47,6 +47,14 @@ export default class Ball {
         return this.mass * this.velocity.len() * this.velocity.len() / 2; 
     }
 
+    public isStripedVariant(): boolean {
+        return this.lookVariant >= 9 && this.lookVariant <= 15;
+    }
+
+    public isSolidVariant(): boolean {
+        return this.lookVariant >= 1 && this.lookVariant <= 8;
+    }
+
 
 
 

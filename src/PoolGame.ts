@@ -3,11 +3,26 @@ import Cue from "./Cue";
 import Game from "./Game";
 import Line from "./Line";
 import Pocket from "./Pocket";
-import { roundRect } from "./Utils";
+import { clamp, roundRect } from "./Utils";
 import Vec2 from "./Vec2";
+
+/**
+    4 main game states:
+    1. ball placement
+    2. aiming
+    3. balls boucing
+    4. end of the round - evaluation
+        4.1. player scored - continue with the same player to state 2.
+        4.2. player didn't score or scored incorrect ball type - continue wiht the other player to state 2.
+        4.3. player put the white ball in the pocket  - switch to the other player and go back to state 1.
+        4.4. player put the black ball in the pocket
+            4.4.1 it is not the last ball - instant fail
+            4.4.2 it is the last ball - win
+ */
 
 export default class PoolGame extends Game {
     public static BALL_RADIUS = 20;
+    public static PLAYABLE_AREA = [180, 200, 1440, 640]; // x, y, w, h
 
     public balls: Ball[] = [];
     public whiteBall: Ball | null = null;
@@ -15,6 +30,8 @@ export default class PoolGame extends Game {
     public pockets: Pocket[] = [];
     public cue: Cue;
     
+    private aimingPhase = false;
+
     public currentPlayer: 1 | 2 = 1;
     public caughtBallsP1: Ball[] = [];
     public caughtBallsP2: Ball[] = [];
@@ -72,6 +89,10 @@ export default class PoolGame extends Game {
     public resetGame() {
         this.resetPlayerScore();
         this.resetBallFormation();
+
+        this.currentPlayer = 1;
+        this.aimingPhase = false;
+        this.phase_ballPlacement();
     }
 
     private resetBallFormation() {
@@ -113,36 +134,100 @@ export default class PoolGame extends Game {
 
 
 
-    
+
+    private phase_ballPlacement() {
+        const handleMouseMove = (ev: MouseEvent) => {
+            if(this.whiteBall != null) {
+                this.whiteBall.position = new Vec2(
+                    clamp(
+                        ev.offsetX, 
+                        PoolGame.PLAYABLE_AREA[0] + PoolGame.BALL_RADIUS, 
+                        PoolGame.PLAYABLE_AREA[0] + PoolGame.PLAYABLE_AREA[2] / 4 - PoolGame.BALL_RADIUS),
+                    clamp(
+                        ev.offsetY, 
+                        PoolGame.PLAYABLE_AREA[1] + PoolGame.BALL_RADIUS, 
+                        PoolGame.PLAYABLE_AREA[1] + PoolGame.PLAYABLE_AREA[3] - PoolGame.BALL_RADIUS),
+                );
+            }
+        };  
+        
+        const handleMouseClick = (ev: MouseEvent) => {
+            if(ev.button == 0) {
+                this.canvas.removeEventListener("mousemove", handleMouseMove);
+                this.canvas.removeEventListener("click", handleMouseClick);
+                this.phase_aiming();
+            }
+        };
+        
+        this.aimingPhase = false;
+        this.cue.enabled = false;
+        this.canvas.addEventListener("mousemove", handleMouseMove);
+        this.canvas.addEventListener("click", handleMouseClick);
+    }
+
+    private phase_aiming() {
+        this.aimingPhase = true;
+        this.cue.enabled = true;
+    }
+
+    private phase_ballsBouncing() {
+        this.aimingPhase = false;
+        this.cue.enabled = false;
+    }
+
+    private nextRound() {
+        this.currentPlayer = (this.currentPlayer == 1) ? 2 : 1;
+    }
+
+    private onBallScored(ball: Ball) {
+        ball.velocity = Vec2.ZERO;
+        if(ball.isSolidVariant()) {
+            this.caughtBallsP1.push(ball);
+        } else if(ball.isStripedVariant()) {
+            this.caughtBallsP2.push(ball);
+        } else {
+            // it's the white ball
+
+            // TODO handle this shit properly!
+            // this.balls.push(ball);
+            // this.phase_aiming();
+        }
+    }
+
+
+
+
     protected onUpdate(dt: number): void {
+        this.aimingPhase = true;
         for(let ball of this.balls) {
             ball.update(dt);
+            if(ball.velocity.len() > 0.001) {
+                this.aimingPhase = false;
+            }
         }
     
-        for(let i = 0; i < this.balls.length; i++) {
-            for (let j = 0; j < this.walls.length; j++) {
-                if(this.balls[i].resolveCollision(this.walls[j])) {
-                    this.balls[i].impact(this.walls[j]);
-                }
-            }
-
-            for (let k = i + 1; k < this.balls.length; k++) {
-                if(this.balls[i].resolveCollision(this.balls[k])) {
-                    this.balls[i].impact(this.balls[k]);
-                }
-            }
-
-            for(let p = 0; p < this.pockets.length; p++) {
-                if(this.pockets[p].isBallCaptured(this.balls[i])) {
-                    if(this.currentPlayer == 1) {
-                        this.caughtBallsP1.push(this.balls[i]);
-                    } else {
-                        this.caughtBallsP2.push(this.balls[i]);
+        if(!this.aimingPhase) {
+            for(let i = 0; i < this.balls.length; i++) {
+                for (let j = 0; j < this.walls.length; j++) {
+                    if(this.balls[i].resolveCollision(this.walls[j])) {
+                        this.balls[i].impact(this.walls[j]);
                     }
-                    
-                    this.balls.splice(i, 1);
-                    i -= 1; // so the balls loop stays at the same index in the next iteration
-                    break;
+                }
+    
+                for (let k = i + 1; k < this.balls.length; k++) {
+                    if(this.balls[i].resolveCollision(this.balls[k])) {
+                        this.balls[i].impact(this.balls[k]);
+                    }
+                }
+    
+                for(let p = 0; p < this.pockets.length; p++) {
+                    if(this.pockets[p].isBallCaptured(this.balls[i])) {
+                        this.onBallScored(this.balls[i]);
+                        
+                        this.balls.splice(i, 1);
+                        i -= 1; // so the balls loop stays at the same index in the next iteration
+                        break;
+                    }
                 }
             }
         }
@@ -161,6 +246,17 @@ export default class PoolGame extends Game {
 
         this.ctx.textAlign = 'left';
         this.ctx.fillText("Player 2", 950, 50);
+
+
+        this.ctx.beginPath();
+        if(this.currentPlayer == 1) {
+            this.ctx.arc(870, 35, 10, 0, Math.PI * 2, false);
+        } else {
+            this.ctx.arc(930, 35, 10, 0, Math.PI * 2, false);
+        }
+        this.ctx.fillStyle = "green";
+        this.ctx.fill();
+
 
         for(let i = 0; i < 7; i++) {
             let ballPos: Vec2;
@@ -229,16 +325,17 @@ export default class PoolGame extends Game {
     }
 
     protected onDraw(): void {
-        this.drawPlayerScoresPanel();
         this.drawTable();
-
+        
         for(const ball of this.balls) {
             ball.draw(this.ctx);
         }
-
-        if(this.cue.enabled) {
+        
+        if(this.aimingPhase) {
             this.cue.draw(this.ctx);
         }
+
+        this.drawPlayerScoresPanel();
 
         // Uncomment to see wall colliders
         // for(const wall of this.walls) {

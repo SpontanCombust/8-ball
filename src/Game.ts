@@ -1,8 +1,8 @@
 export default abstract class Game {
     private lastTimestamp: number = 0;
 
-    protected canvas: HTMLCanvasElement;
-    protected ctx: CanvasRenderingContext2D;
+    public canvas: HTMLCanvasElement;
+    public ctx: CanvasRenderingContext2D;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;

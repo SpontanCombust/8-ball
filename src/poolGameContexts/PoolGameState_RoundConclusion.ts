@@ -14,9 +14,9 @@ export default class PoolGameState_RoundConclusion extends PoolGameState {
     }
 
     onEnterState(): void {
-        // no ball was scored
         if(this.scoredBalls.length == 0) {
             this.game.switchPlayer();
+            this.game.makeAnnouncement("No ball scored! Player " + this.game.currentPlayer + "'s turn!", 2000);
             this.game.changeState(new PoolGameState_Aiming(this.game));
             return;
         }
@@ -49,23 +49,25 @@ export default class PoolGameState_RoundConclusion extends PoolGameState {
             }
         }
 
-        // TODO some form of announcement text to be displayed in the middle
-        // to inform about the result of the round
         if(scoredBlack) {
             const opponent = (this.game.currentPlayer == 1) ? 2 : 1;
+            //TODO add debug buttons for quicker testing
             if(won) {
-                console.log("Victory for player " + this.game.currentPlayer + "!");
+                this.game.announcementText = "Player " + this.game.currentPlayer + " won!";
             } else {
-                console.log("Victory for player " + opponent + "!");
+                this.game.announcementText = "Faul! Player " + opponent + " won!";
             }
         } else if(scoredWhite) {
+            this.game.makeAnnouncement("Faul! White ball scored! Player " + this.game.currentPlayer + "'s turn!", 4000);
             this.game.ballsOnTable.push(this.game.whiteBall);
             this.game.switchPlayer();
             this.game.changeState(new PoolGameContext_BallPlacement(this.game, false));
         } else if(scoredIncorrectVariant) {
+            this.game.makeAnnouncement("Faul! Incorrect ball scored! Player " + this.game.currentPlayer + "'s turn!", 4000);
             this.game.switchPlayer();
             this.game.changeState(new PoolGameState_Aiming(this.game));
         } else {
+            this.game.makeAnnouncement("Scored!", 2000);
             this.game.changeState(new PoolGameState_Aiming(this.game));
         }
     }

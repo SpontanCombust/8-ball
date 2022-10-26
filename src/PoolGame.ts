@@ -38,6 +38,8 @@ export default class PoolGame extends Game {
 
     public state: PoolGameState;
 
+    public announcementText = "";
+
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -63,7 +65,7 @@ export default class PoolGame extends Game {
 
 
 
-
+    // TODO tweak walls and pockets so it's easier to score
     private static WALL_VERTICES = [
         // upper wall
         [new Vec2(190, 170), new Vec2(220, 200), new Vec2(850, 200), new Vec2(865, 170)],
@@ -149,6 +151,13 @@ export default class PoolGame extends Game {
         this.currentPlayer = (this.currentPlayer == 1) ? 2 : 1;
     }
 
+    public makeAnnouncement(text: string, howLong: number) {
+        this.announcementText = text;
+        setTimeout(() => {
+            this.announcementText = "";
+        }, howLong);
+    }
+
 
    
 
@@ -177,7 +186,7 @@ export default class PoolGame extends Game {
         } else {
             this.ctx.arc(930, 35, 10, 0, Math.PI * 2, false);
         }
-        this.ctx.fillStyle = "green";
+        this.ctx.fillStyle = "red";
         this.ctx.fill();
 
 
@@ -247,6 +256,20 @@ export default class PoolGame extends Game {
         }
     }
 
+    private drawAnnouncementText() {
+        const x = PoolGame.PLAYABLE_AREA[0] + PoolGame.PLAYABLE_AREA[2] / 2;
+        const y = PoolGame.PLAYABLE_AREA[1] + PoolGame.PLAYABLE_AREA[3] * 0.1;
+
+        this.ctx.fillStyle = "yellow";
+        this.ctx.strokeStyle = "black";
+        this.ctx.lineWidth = 2;
+        this.ctx.font = '70px arial';
+        this.ctx.textBaseline = 'alphabetic';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(this.announcementText, x, y);
+        this.ctx.strokeText(this.announcementText, x, y);
+    }
+
     protected onDraw(): void {
         this.drawTable();
         
@@ -259,5 +282,9 @@ export default class PoolGame extends Game {
         }
 
         this.drawPlayerScoresPanel();
+
+        if(this.announcementText.length > 0) {
+            this.drawAnnouncementText();
+        }
     }
 }

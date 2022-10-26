@@ -64,7 +64,6 @@ export default class PoolGameState_RoundSimulation extends PoolGameState {
         this.checkPockets();
 
         if(!this.isAnyBallMoving()) {
-            //TODO short circuit on white and black balls
             this.game.changeState(new PoolGameState_RoundConclusion(this.game, this.ballsInPockets));
         }
     }

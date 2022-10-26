@@ -26,15 +26,15 @@ export default class PoolGame extends Game {
     public static BALL_RADIUS = 20;
     public static PLAYABLE_AREA = [180, 200, 1440, 640]; // x, y, w, h
 
-    public balls: Ball[] = [];
-    public whiteBall: Ball | null = null;
+    public ballsOnTable: Ball[] = [];
     public walls: Line[] = [];
     public pockets: Pocket[] = [];
     public cue: Cue;
     
+    public whiteBall: Ball;
     public currentPlayer: 1 | 2 = 1;
-    public caughtBallsP1: Ball[] = [];
-    public caughtBallsP2: Ball[] = [];
+    public scoredBallsP1: Ball[] = [];
+    public scoredBallsP2: Ball[] = [];
 
     public state: PoolGameState;
 
@@ -42,6 +42,7 @@ export default class PoolGame extends Game {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.cue = new Cue(this.canvas);
+        this.whiteBall = new Ball(Vec2.ZERO, PoolGame.BALL_RADIUS, 0);
         
         this.setupWallColliders();
         this.setupPockets();
@@ -54,7 +55,7 @@ export default class PoolGame extends Game {
 
 
 
-    public changeState<T extends PoolGameState>(state: T) {
+    public changeState(state: PoolGameState) {
         this.state.onLeaveState();
         this.state = state;
         this.state.onEnterState();
@@ -105,15 +106,14 @@ export default class PoolGame extends Game {
 
         this.currentPlayer = 1;
 
-        if(init) {
+        if(!init) {
             this.changeState(new PoolGameContext_Init(this));
         }
     }
 
     private resetBallFormation() {
-        this.balls = [
-            new Ball(new Vec2(525, 520), PoolGame.BALL_RADIUS, 0),
-            
+        this.ballsOnTable = [
+            this.whiteBall,
 
             new Ball(new Vec2(1275, 520), PoolGame.BALL_RADIUS, 1),
 
@@ -136,13 +136,13 @@ export default class PoolGame extends Game {
             new Ball(new Vec2(1415, 600), PoolGame.BALL_RADIUS, 15),
         ];
 
-        this.whiteBall = this.balls[0];
-        this.cue.target = this.balls[0];
+        this.whiteBall.position = new Vec2(525, 520);
+        this.cue.target = this.whiteBall;
     }
 
     private resetPlayerScore() {
-        this.caughtBallsP1 = [];
-        this.caughtBallsP2 = [];
+        this.scoredBallsP1 = [];
+        this.scoredBallsP2 = [];
     }
 
     public switchPlayer() {
@@ -194,9 +194,9 @@ export default class PoolGame extends Game {
 
             ballPos = new Vec2(570 + i * (2 * PoolGame.BALL_RADIUS + 5), 80);
 
-            if(i < this.caughtBallsP1.length) {
-                this.caughtBallsP1[i].position = ballPos;
-                this.caughtBallsP1[i].draw(this.ctx);
+            if(i < this.scoredBallsP1.length) {
+                this.scoredBallsP1[i].position = ballPos;
+                this.scoredBallsP1[i].draw(this.ctx);
             } else {
                 drawEmpty();
             }
@@ -204,9 +204,9 @@ export default class PoolGame extends Game {
 
             ballPos = new Vec2(960 + i * (2 * PoolGame.BALL_RADIUS + 5), 80);
 
-            if(i < this.caughtBallsP2.length) {
-                this.caughtBallsP1[i].position = ballPos;
-                this.caughtBallsP1[i].draw(this.ctx);
+            if(i < this.scoredBallsP2.length) {
+                this.scoredBallsP2[i].position = ballPos;
+                this.scoredBallsP2[i].draw(this.ctx);
             } else {
                 drawEmpty();
             }
@@ -250,7 +250,7 @@ export default class PoolGame extends Game {
     protected onDraw(): void {
         this.drawTable();
         
-        for(const ball of this.balls) {
+        for(const ball of this.ballsOnTable) {
             ball.draw(this.ctx);
         }
         

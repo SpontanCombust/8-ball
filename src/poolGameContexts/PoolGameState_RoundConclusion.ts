@@ -29,9 +29,9 @@ export default class PoolGameState_RoundConclusion extends PoolGameState {
             const ball = this.scoredBalls[i];
             
             if(ball.isStripedVariant()) {
-                this.game.caughtBallsP2.push(ball);
+                this.game.scoredBallsP2.push(ball);
             } else if(ball.isSolidVariant() && ball.lookVariant != 8) {
-                this.game.caughtBallsP1.push(ball);
+                this.game.scoredBallsP1.push(ball);
             }
             
             if(!ball.isSolidVariant() && !ball.isStripedVariant()) {
@@ -39,7 +39,7 @@ export default class PoolGameState_RoundConclusion extends PoolGameState {
             }
             else if(ball.lookVariant == 8) {
                 scoredBlack = true;
-                if(i == this.scoredBalls.length - 1) {
+                if(i == this.scoredBalls.length - 1 && this.game.ballsOnTable.length <= 1) {
                     won = true;
                 }
             }
@@ -52,13 +52,14 @@ export default class PoolGameState_RoundConclusion extends PoolGameState {
         // TODO some form of announcement text to be displayed in the middle
         // to inform about the result of the round
         if(scoredBlack) {
+            const opponent = (this.game.currentPlayer == 1) ? 2 : 1;
             if(won) {
                 console.log("Victory for player " + this.game.currentPlayer + "!");
             } else {
-                this.game.switchPlayer();
-                console.log("Victory for player " + this.game.currentPlayer + "!");
+                console.log("Victory for player " + opponent + "!");
             }
         } else if(scoredWhite) {
+            this.game.ballsOnTable.push(this.game.whiteBall);
             this.game.switchPlayer();
             this.game.changeState(new PoolGameContext_BallPlacement(this.game, false));
         } else if(scoredIncorrectVariant) {

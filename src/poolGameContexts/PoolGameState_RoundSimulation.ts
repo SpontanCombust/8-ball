@@ -3,7 +3,7 @@ import PoolGameState from "../PoolGameState";
 import PoolGameState_RoundConclusion from "./PoolGameState_RoundConclusion";
 
 export default class PoolGameState_RoundSimulation extends PoolGameState {
-    private scoredBalls: Ball[] = [];
+    private ballsInPockets: Ball[] = [];
 
     onEnterState(): void {
         this.game.cue.enabled = false;
@@ -15,29 +15,29 @@ export default class PoolGameState_RoundSimulation extends PoolGameState {
 
 
     private updateBallPhysics(dt: number) {
-        for(let ball of this.game.balls) {
+        for(let ball of this.game.ballsOnTable) {
             ball.update(dt);
         }
     }
 
     private computeCollisions() {
-        for(let i = 0; i < this.game.balls.length; i++) {
+        for(let i = 0; i < this.game.ballsOnTable.length; i++) {
             for (let j = 0; j < this.game.walls.length; j++) {
-                if(this.game.balls[i].resolveCollision(this.game.walls[j])) {
-                    this.game.balls[i].impact(this.game.walls[j]);
+                if(this.game.ballsOnTable[i].resolveCollision(this.game.walls[j])) {
+                    this.game.ballsOnTable[i].impact(this.game.walls[j]);
                 }
             }
 
-            for (let k = i + 1; k < this.game.balls.length; k++) {
-                if(this.game.balls[i].resolveCollision(this.game.balls[k])) {
-                    this.game.balls[i].impact(this.game.balls[k]);
+            for (let k = i + 1; k < this.game.ballsOnTable.length; k++) {
+                if(this.game.ballsOnTable[i].resolveCollision(this.game.ballsOnTable[k])) {
+                    this.game.ballsOnTable[i].impact(this.game.ballsOnTable[k]);
                 }
             }
         }
     }
 
     private isAnyBallMoving(): boolean {
-        for(let ball of this.game.balls) {
+        for(let ball of this.game.ballsOnTable) {
             if(ball.velocity.len() > 0.01) {
                 return true;
             }
@@ -48,9 +48,10 @@ export default class PoolGameState_RoundSimulation extends PoolGameState {
 
     private checkPockets() {
         for(let i = 0; i < this.game.pockets.length; i++) {
-            for(let j = 0; j < this.game.balls.length; j++) {
-                if(this.game.pockets[i].isBallCaptured(this.game.balls[j])) {
-                    this.game.balls.splice(j, 1);
+            for(let j = 0; j < this.game.ballsOnTable.length; j++) {
+                if(this.game.pockets[i].isBallCaptured(this.game.ballsOnTable[j])) {
+                    this.ballsInPockets.push(this.game.ballsOnTable[j]);
+                    this.game.ballsOnTable.splice(j, 1);
                     break;
                 }
             }
@@ -64,7 +65,7 @@ export default class PoolGameState_RoundSimulation extends PoolGameState {
 
         if(!this.isAnyBallMoving()) {
             //TODO short circuit on white and black balls
-            this.game.changeState(new PoolGameState_RoundConclusion(this.game, this.scoredBalls));
+            this.game.changeState(new PoolGameState_RoundConclusion(this.game, this.ballsInPockets));
         }
     }
 }

@@ -17,16 +17,21 @@ export default class PoolGameContext_BallPlacement extends PoolGameState {
         if(this.game.whiteBall != null) {
             let newPos = new Vec2(ev.offsetX, ev.offsetY);
 
-            if(!this.canPlaceAnywhere) {
-                newPos.x = clamp(
-                    newPos.x, 
-                    PoolGame.PLAYABLE_AREA[0] + PoolGame.BALL_RADIUS, 
-                    PoolGame.PLAYABLE_AREA[0] + PoolGame.PLAYABLE_AREA[2] / 4 - PoolGame.BALL_RADIUS);
-                newPos.y = clamp(
-                    newPos.y, 
-                    PoolGame.PLAYABLE_AREA[1] + PoolGame.BALL_RADIUS, 
-                    PoolGame.PLAYABLE_AREA[1] + PoolGame.PLAYABLE_AREA[3] - PoolGame.BALL_RADIUS);
+            let horizontalBoundry;
+            if(this.canPlaceAnywhere) {
+                horizontalBoundry = PoolGame.PLAYABLE_AREA[0] + PoolGame.PLAYABLE_AREA[2] - PoolGame.BALL_RADIUS;
+            } else {
+                horizontalBoundry = PoolGame.PLAYABLE_AREA[0] + PoolGame.PLAYABLE_AREA[2] / 4 - PoolGame.BALL_RADIUS;
             }
+
+            newPos.x = clamp(
+                newPos.x, 
+                PoolGame.PLAYABLE_AREA[0] + PoolGame.BALL_RADIUS, 
+                horizontalBoundry);
+            newPos.y = clamp(
+                newPos.y, 
+                PoolGame.PLAYABLE_AREA[1] + PoolGame.BALL_RADIUS, 
+                PoolGame.PLAYABLE_AREA[1] + PoolGame.PLAYABLE_AREA[3] - PoolGame.BALL_RADIUS);
 
             this.game.whiteBall.position = newPos;
         }

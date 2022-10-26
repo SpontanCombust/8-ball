@@ -12,6 +12,9 @@ export default class Cue {
     private mousePos = new Vec2();
     private strength = 0.5;
 
+    public onHit: () => void = () => {};
+
+    
     constructor(canvas: HTMLCanvasElement) {
         this.setupCanvasObserver(canvas);
     }
@@ -51,6 +54,8 @@ export default class Cue {
                 this.directionFromTarget().negated(),
                 this.getHitStrengh()
             );
+
+            this.onHit();
         }
     }
 

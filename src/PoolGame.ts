@@ -3,7 +3,9 @@ import Cue from "./Cue";
 import Game from "./Game";
 import Line from "./Line";
 import Pocket from "./Pocket";
-import { clamp, roundRect } from "./Utils";
+import type PoolGameState from "./PoolGameState";
+import PoolGameContext_Init from "./poolGameContexts/PoolGameState_Init";
+import { roundRect } from "./Utils";
 import Vec2 from "./Vec2";
 
 /**
@@ -30,21 +32,32 @@ export default class PoolGame extends Game {
     public pockets: Pocket[] = [];
     public cue: Cue;
     
-    private aimingPhase = false;
-
     public currentPlayer: 1 | 2 = 1;
     public caughtBallsP1: Ball[] = [];
     public caughtBallsP2: Ball[] = [];
+
+    public state: PoolGameState;
 
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.cue = new Cue(this.canvas);
-
+        
         this.setupWallColliders();
         this.setupPockets();
+        
+        this.state = new PoolGameContext_Init(this);
+        this.state.onEnterState();
 
-        this.resetGame();
+        this.resetGame(true);
+    }
+
+
+
+    public changeState<T extends PoolGameState>(state: T) {
+        this.state.onLeaveState();
+        this.state = state;
+        this.state.onEnterState();
     }
 
 
@@ -86,19 +99,19 @@ export default class PoolGame extends Game {
 
 
 
-    public resetGame() {
+    public resetGame(init = false) {
         this.resetPlayerScore();
         this.resetBallFormation();
 
         this.currentPlayer = 1;
-        this.aimingPhase = false;
-        this.phase_ballPlacement();
+
+        if(init) {
+            this.changeState(new PoolGameContext_Init(this));
+        }
     }
 
     private resetBallFormation() {
         this.balls = [
-            // TODO allow the player to choose the position of the white ball
-            // draw vertical line at 1/4th of the width
             new Ball(new Vec2(525, 520), PoolGame.BALL_RADIUS, 0),
             
 
@@ -132,105 +145,15 @@ export default class PoolGame extends Game {
         this.caughtBallsP2 = [];
     }
 
-
-
-
-    private phase_ballPlacement() {
-        const handleMouseMove = (ev: MouseEvent) => {
-            if(this.whiteBall != null) {
-                this.whiteBall.position = new Vec2(
-                    clamp(
-                        ev.offsetX, 
-                        PoolGame.PLAYABLE_AREA[0] + PoolGame.BALL_RADIUS, 
-                        PoolGame.PLAYABLE_AREA[0] + PoolGame.PLAYABLE_AREA[2] / 4 - PoolGame.BALL_RADIUS),
-                    clamp(
-                        ev.offsetY, 
-                        PoolGame.PLAYABLE_AREA[1] + PoolGame.BALL_RADIUS, 
-                        PoolGame.PLAYABLE_AREA[1] + PoolGame.PLAYABLE_AREA[3] - PoolGame.BALL_RADIUS),
-                );
-            }
-        };  
-        
-        const handleMouseClick = (ev: MouseEvent) => {
-            if(ev.button == 0) {
-                this.canvas.removeEventListener("mousemove", handleMouseMove);
-                this.canvas.removeEventListener("click", handleMouseClick);
-                this.phase_aiming();
-            }
-        };
-        
-        this.aimingPhase = false;
-        this.cue.enabled = false;
-        this.canvas.addEventListener("mousemove", handleMouseMove);
-        this.canvas.addEventListener("click", handleMouseClick);
-    }
-
-    private phase_aiming() {
-        this.aimingPhase = true;
-        this.cue.enabled = true;
-    }
-
-    private phase_ballsBouncing() {
-        this.aimingPhase = false;
-        this.cue.enabled = false;
-    }
-
-    private nextRound() {
+    public switchPlayer() {
         this.currentPlayer = (this.currentPlayer == 1) ? 2 : 1;
     }
 
-    private onBallScored(ball: Ball) {
-        ball.velocity = Vec2.ZERO;
-        if(ball.isSolidVariant()) {
-            this.caughtBallsP1.push(ball);
-        } else if(ball.isStripedVariant()) {
-            this.caughtBallsP2.push(ball);
-        } else {
-            // it's the white ball
 
-            // TODO handle this shit properly!
-            // this.balls.push(ball);
-            // this.phase_aiming();
-        }
-    }
-
-
-
+   
 
     protected onUpdate(dt: number): void {
-        this.aimingPhase = true;
-        for(let ball of this.balls) {
-            ball.update(dt);
-            if(ball.velocity.len() > 0.001) {
-                this.aimingPhase = false;
-            }
-        }
-    
-        if(!this.aimingPhase) {
-            for(let i = 0; i < this.balls.length; i++) {
-                for (let j = 0; j < this.walls.length; j++) {
-                    if(this.balls[i].resolveCollision(this.walls[j])) {
-                        this.balls[i].impact(this.walls[j]);
-                    }
-                }
-    
-                for (let k = i + 1; k < this.balls.length; k++) {
-                    if(this.balls[i].resolveCollision(this.balls[k])) {
-                        this.balls[i].impact(this.balls[k]);
-                    }
-                }
-    
-                for(let p = 0; p < this.pockets.length; p++) {
-                    if(this.pockets[p].isBallCaptured(this.balls[i])) {
-                        this.onBallScored(this.balls[i]);
-                        
-                        this.balls.splice(i, 1);
-                        i -= 1; // so the balls loop stays at the same index in the next iteration
-                        break;
-                    }
-                }
-            }
-        }
+        this.state.onUpdate(dt);
     }
 
 
@@ -331,15 +254,10 @@ export default class PoolGame extends Game {
             ball.draw(this.ctx);
         }
         
-        if(this.aimingPhase) {
+        if(this.cue.enabled) {
             this.cue.draw(this.ctx);
         }
 
         this.drawPlayerScoresPanel();
-
-        // Uncomment to see wall colliders
-        // for(const wall of this.walls) {
-        //     wall.draw(this.ctx);
-        // }
     }
 }

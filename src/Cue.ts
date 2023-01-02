@@ -26,6 +26,7 @@ export default class Cue {
         });
 
         canvas.addEventListener("wheel", (ev) => {
+            ev.preventDefault();
             this.strength = clamp(this.strength - ev.deltaY / 100, 0.0, 1.0);
         });
 

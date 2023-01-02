@@ -1,6 +1,18 @@
+body {
+    background-color: lightskyblue;
+}
+
 canvas {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     width: 95vw;
-    height: 95vh;
+    height: 96vh;
     margin-left: 2vw;
+}
+
+#instructions {
+    margin-top: 2cm;
+    
+    text-align: center;
+    font-family: Helvetica;
+    color: white;
 }

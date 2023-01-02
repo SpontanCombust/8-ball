@@ -1,4 +1,7 @@
 {
+  "name": "8-ball-game",
+  "version": "1.0.0",
+  "author": "Przemysław Cedro (SpontanCombust)",
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build"

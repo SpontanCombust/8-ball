@@ -1,8 +1,20 @@
 import Vec2 from "./Vec2";
 
+/**
+ * Class representing an edge between two points
+ * @class Line
+ */
 export default class Line {
+    /**
+     * First line point
+     */
     public p1: Vec2;
+    /**
+     * Second line point
+     */
     public p2: Vec2;
+
+
     // calculated coefficients
     private a: number;
     private b: number;
@@ -17,16 +29,26 @@ export default class Line {
     }
 
     
-    
+    /**
+     * Says whether this line is aligned to the x axis 
+     * @returns true if horizontal
+     */
     private isPerfectlyHorizontal(): boolean {
         return Math.abs(this.p1.y - this.p2.y) < 0.00001;
     }
-
+    /**
+     * Says whether this line is aligned to the y axis 
+     * @returns true if vertical
+     */
     private isPerfectlyVertical(): boolean {
         return Math.abs(this.p1.x - this.p2.x) < 0.00001;
     }
 
-    // Tests whether point p can be placed on this line
+    /**
+     * Tests whether point p can be placed on this line
+     * @param p point
+     * @returns true if this line contains the point
+     */
     public contains(p: Vec2): boolean {
         function numberInRange(x: number, n1: number, n2: number) {
             if(n1 < n2) {
@@ -52,7 +74,11 @@ export default class Line {
         return false;
     }
 
-    // Returns a non-unit normal vector of this (unbound) line, going through p0
+    /**
+     * Returns a non-unit normal vector of this (unbound) line, going through p0
+     * @param p0 intersection point
+     * @returns vector perpendicular to this line
+     */
     public normalTo(p0: Vec2): Vec2 {
         if(this.isPerfectlyVertical()) {
             return new Vec2(p0.x - this.p1.x, 0);
@@ -76,7 +102,10 @@ export default class Line {
 
 
 
-    // For debugging purposes
+    /**
+     * Draws the line; used for debugging purposes
+     * @param ctx rendering context
+     */
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.moveTo(this.p1.x, this.p1.y);

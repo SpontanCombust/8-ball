@@ -1,17 +1,48 @@
 import type Line from "./Line";
 import Vec2 from "./Vec2";
 
+/**
+ * Represents the pool ball that can react with other balls of the same kind and walls
+ * @class Ball
+ */
 export default class Ball {
+    /**
+     * Magnitude of the restistance force that the ball experiences when it is moving
+     */
     public static RESISTANCE_FORCE_MAGN = 50;
+    /**
+     * Factor which dictates how much velocity is lost by the ball when it hits a wall
+     */
     public static WALL_VELOCITY_ABSORPTION_FACTOR = 0.1;
 
+    /**
+     * Position of the ball on the table
+     */
     public position: Vec2;
+    /**
+     * Radius of the ball
+     */
     public radius: number;
+    /**
+     * Number by which the ball is identified, which dictates how it should look
+     */
     public lookVariant: number;
+    /**
+     * Mass of the ball
+     */
     public mass: number;
     
+    /**
+     * Current force that is exerted onto the ball
+     */
     public pushForce: Vec2 = new Vec2();
+    /**
+     * Ball's acceleration in space
+     */
     public acceleration: Vec2 = new Vec2();
+    /**
+     * Ball's current velocity
+     */
     public velocity: Vec2 = new Vec2();
     
     constructor(position: Vec2, radius: number, lookVariant?: number, mass?: number) {
@@ -23,7 +54,10 @@ export default class Ball {
 
 
 
-
+    /**
+     * Calculates the vector of the resistance force that should currently be exerted onto the ball
+     * @returns Current resistance force
+     */
     public resistanceForce(): Vec2 {
         const HALT_VELOCITY_THRESHOLD = 10; 
 
@@ -39,25 +73,42 @@ export default class Ball {
         return Vec2.scaled(this.velocity.normalized(), -Ball.RESISTANCE_FORCE_MAGN * resistanceMultip);
     }
 
+    /**
+     * @returns Ball's momentum (product of mass and velocity)
+     */
     public momentum(): Vec2 {
         return Vec2.scaled(this.velocity, this.mass);
     }
 
+    /**
+     * @returns Ball's kinetic energy
+     */
     public kineticEnergy(): number {
         return this.mass * this.velocity.len() * this.velocity.len() / 2; 
     }
 
+
+    /**
+     * @returns Returns whether this ball's variant will give it a striped color appearance
+     */
     public isStripedVariant(): boolean {
         return this.lookVariant >= 9 && this.lookVariant <= 15;
     }
 
+    /**
+     * @returns Returns whether this ball's variant will give it a solid color appearance
+     */
     public isSolidVariant(): boolean {
         return this.lookVariant >= 1 && this.lookVariant <= 8;
     }
 
 
 
-
+    /**
+     * Detects and if necessary corrects position of the ball and collider object resulting from their collision
+     * @param collider ball or wall collider
+     * @returns if collision happened
+     */
     public resolveCollision(collider: Ball | Line): boolean {
         if(collider instanceof Ball) {
             return this.resolveCollisionWithBall(collider);
@@ -66,6 +117,11 @@ export default class Ball {
         }
     }
 
+    /**
+     * Detects and if necessary corrects position of this ball and other ball resulting from their collision
+     * @param collider other ball
+     * @returns if collision happened
+     */
     private resolveCollisionWithBall(other: Ball): boolean {
         const posDiff = Vec2.diff(other.position, this.position);
         const radiusSum = this.radius + other.radius;
@@ -82,6 +138,11 @@ export default class Ball {
         return false;
     }
 
+    /**
+     * Detects and if necessary corrects position of this ball resulting from collision with a wall
+     * @param collider wall
+     * @returns if collision happened
+     */
     private resolveCollisionWithWall(wall: Line): boolean {
         const normal = wall.normalTo(this.position);
         const possibleCollisionPoint = Vec2.diff(this.position, normal); // add a negative of normal vec
@@ -101,7 +162,10 @@ export default class Ball {
 
 
 
-    
+    /**
+     * Resolves the transfer of momentum between this and other physical object
+     * @param impacted other object this object got in contact with 
+     */
     public impact(impacted: Ball | Line) {
         if(impacted instanceof Ball) {
             this.impactWithBall(impacted);
@@ -110,6 +174,10 @@ export default class Ball {
         }
     }
 
+    /**
+     * Resolves the transfer of momentum between this and other ball
+     * @param impacted other ball
+     */
     private impactWithBall(impacted: Ball) {
         //TODO make balls less bouncy
         // console.log(`BEFORE: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
@@ -154,18 +222,33 @@ export default class Ball {
         // console.log(`AFTER: p = ${Vec2.sum(this.momentum(), impacted.momentum())}, Ek = ${this.kineticEnergy() + impacted.kineticEnergy()}`);
     }
 
+    /**
+     * Resolves the transfer of momentum between this ball and a wall
+     * @param impacted hit wall
+     */
     private impactWithWall(impacted: Line) {
         const normal = impacted.normalTo(this.position);
         // DISCUSS absorption should probably be done only to the velocity component parallel to wall's normal
         this.velocity = Vec2.scaled(this.velocity.reflected(normal.normalized()), 1.0 - Ball.WALL_VELOCITY_ABSORPTION_FACTOR);
     }
 
+    /**
+     * @param momentum momentum
+     * @returns velocity calculated from given momentum
+     */
     private velocityFromMomentum(momentum: Vec2): Vec2 {
         return Vec2.scaled(momentum, 1 / this.mass);
     }
 
-    // Based on conservation of momentum and conservation of kinetic energy
-    // Returns final velocity of 'this' in the direction axis
+    /**
+     * Calculates the amount of velocity that should be transferred to this ball 
+     * based on conservation of momentum and conservation of kinetic energy
+     * @param impacted other impacted ball
+     * @param thisTransferableVelocity 
+     * @param impactedTransferableVelocity 
+     * @returns final velocity of 'this' in the direction axis
+     * @private
+     */
     private computeImpactVelocityDistribution(impacted: Ball, thisTransferableVelocity: Vec2, impactedTransferableVelocity: Vec2): Vec2 {
         return Vec2.sum(
             Vec2.scaled(
@@ -181,7 +264,10 @@ export default class Ball {
 
 
 
-
+    /**
+     * Update this ball's physics
+     * @param dt time since last frame
+     */
     public update(dt: number) {
         let finalForce: Vec2;
         if(this.pushForce.len() >= this.resistanceForce().len()) {
@@ -199,7 +285,10 @@ export default class Ball {
 
 
 
-
+    /**
+     * Draw this ball onto canvas
+     * @param ctx rendering context
+     */
     public draw(ctx: CanvasRenderingContext2D) {
         switch(this.lookVariant) {
         case 1:
@@ -252,6 +341,10 @@ export default class Ball {
         }
     }
 
+    /**
+     * Draw this ball as plain white
+     * @param ctx rendering context
+     */
     private drawWhite(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
@@ -262,6 +355,11 @@ export default class Ball {
         ctx.stroke();
     }
 
+    /**
+     * Draw this ball as a solid color variant
+     * @param ctx rendering context
+     * @param color fill color
+     */
     private drawSolid(ctx: CanvasRenderingContext2D, color: string) {
         ctx.strokeStyle = "black";
         ctx.lineWidth = 1;
@@ -285,6 +383,11 @@ export default class Ball {
         ctx.fillText(this.lookVariant.toString(), this.position.x, this.position.y + 5);
     }
 
+    /**
+     * Draw this ball as a striped color variant
+     * @param ctx rendering context
+     * @param color fill color
+     */
     private drawStriped(ctx: CanvasRenderingContext2D, color: string) {
         ctx.strokeStyle = "black";
         ctx.lineWidth = 1;

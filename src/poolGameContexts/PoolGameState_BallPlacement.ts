@@ -4,7 +4,14 @@ import Vec2 from "../Vec2";
 import PoolGameState from "../PoolGameState";
 import PoolGameState_Aiming from "./PoolGameState_Aiming";
 
+/**
+ * Class for game's state when the player is placing the ball
+ * @class PoolGameContext_BallPlacement
+ */
 export default class PoolGameContext_BallPlacement extends PoolGameState {
+    /**
+     * Denotes whether the ball should be constrained to a specified table region
+     */
     canPlaceAnywhere: boolean;
 
     constructor(game: PoolGame, startingRound: boolean) {
@@ -13,6 +20,10 @@ export default class PoolGameContext_BallPlacement extends PoolGameState {
         this.canPlaceAnywhere = !startingRound;
     }
 
+    /**
+     * Method that reacts to player's mouse movement
+     * @param ev mouse event
+     */
     private handleMouseMove = (ev: MouseEvent) => {
         let newPos = new Vec2(ev.offsetX, ev.offsetY);
 
@@ -35,6 +46,10 @@ export default class PoolGameContext_BallPlacement extends PoolGameState {
         this.game.whiteBall.position = newPos;
     };  
     
+    /**
+     * Method that reacts to player's mouse clicks
+     * @param ev mouse event
+     */
     private handleMouseClick = (ev: MouseEvent) => {
         if(ev.button == 0) {
             this.game.changeState(new PoolGameState_Aiming(this.game));

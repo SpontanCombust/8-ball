@@ -9,7 +9,7 @@ import { roundRect } from "./Utils";
 import Vec2 from "./Vec2";
 
 /**
-    4 main game states:
+ * 4 main game states:
     1. ball placement
     2. aiming
     3. balls boucing
@@ -20,15 +20,37 @@ import Vec2 from "./Vec2";
         4.4. player put the black ball in the pocket
             4.4.1 it is not the last ball - instant fail
             4.4.2 it is the last ball - win
- */
+*/
 
+/**
+ * Central processing class of game's logic and rendering
+ * @class PoolGame
+*/
 export default class PoolGame extends Game {
+    /**
+     * Radius of pool balls
+     */
     public static BALL_RADIUS = 20;
+    /**
+     * Dimensions of the inside of the pool table
+     */
     public static PLAYABLE_AREA = [180, 200, 1440, 640]; // x, y, w, h
 
+    /**
+     * Array of balls on the table
+     */
     public ballsOnTable: Ball[] = [];
+    /**
+     * Array of walls bounding the play area
+     */
     public walls: Line[] = [];
+    /**
+     * Array of scoring pockets
+     */
     public pockets: Pocket[] = [];
+    /**
+     * Cue used to hit balls
+     */
     public cue: Cue;
     
     public whiteBall: Ball;
@@ -36,8 +58,14 @@ export default class PoolGame extends Game {
     public scoredBallsP1: Ball[] = [];
     public scoredBallsP2: Ball[] = [];
 
+    /**
+     * Current game state
+     */
     public state: PoolGameState;
 
+    /**
+     * Text displayed during end of the round 
+     */
     public announcementText = "";
 
 
@@ -56,7 +84,10 @@ export default class PoolGame extends Game {
     }
 
 
-
+    /**
+     * Change the current state of the game
+     * @param state new state
+     */
     public changeState(state: PoolGameState) {
         this.state.onLeaveState();
         this.state = state;
@@ -64,8 +95,9 @@ export default class PoolGame extends Game {
     }
 
 
-
-    // TODO tweak walls and pockets so it's easier to score
+    /**
+     * Array of line coordinates which form pool table walls
+     */
     private static WALL_VERTICES = [
         // upper wall
         [new Vec2(190, 170), new Vec2(220, 200), new Vec2(850, 200), new Vec2(865, 170)],
@@ -101,7 +133,10 @@ export default class PoolGame extends Game {
 
 
 
-
+    /**
+     * Sets the game back to its initial state
+     * @param init if it's done the first time
+     */
     public resetGame(init = false) {
         this.resetPlayerScore();
         this.resetBallFormation();
@@ -147,10 +182,18 @@ export default class PoolGame extends Game {
         this.scoredBallsP2 = [];
     }
 
+    /**
+     * Signal player choice
+     */
     public switchPlayer() {
         this.currentPlayer = (this.currentPlayer == 1) ? 2 : 1;
     }
 
+    /**
+     * Set announcement text and for how long it should be displayed
+     * @param text announcement
+     * @param howLong time in millis
+     */
     public makeAnnouncement(text: string, howLong: number) {
         this.announcementText = text;
         setTimeout(() => {
@@ -270,6 +313,9 @@ export default class PoolGame extends Game {
         this.ctx.strokeText(this.announcementText, x, y);
     }
 
+    /**
+     * Draw the playing table, cue, balls and score on top
+     */
     protected onDraw(): void {
         this.drawTable();
         

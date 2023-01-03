@@ -4,6 +4,10 @@ import PoolGameState from "../PoolGameState";
 import PoolGameState_Aiming from "./PoolGameState_Aiming";
 import PoolGameContext_BallPlacement from "./PoolGameState_BallPlacement";
 
+/**
+ * Class for game's state when all the balls stop moving and a round can be ended
+ * @class PoolGameContext_BallPlacement
+ */
 export default class PoolGameState_RoundConclusion extends PoolGameState {
     private scoredBalls: Ball[];
 

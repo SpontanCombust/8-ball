@@ -1,3 +1,3 @@
 # 8-Ball Pool App
 
-TODO: description
+Simple pool game written with HTML5 Canvas API. 

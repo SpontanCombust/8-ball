@@ -2,16 +2,38 @@ import type Ball from "./Ball";
 import { clamp } from "./Utils";
 import Vec2 from "./Vec2";
 
+/**
+ * Represents the cue used to hit the white ball
+ * @class Cue
+ */
 export default class Cue {
+    /**
+     * How far cue can be offset away from the ball
+     */
     private static MAX_OFFSET_FROM_TARGET = 200;
     private static STRENGH_MULTIPLIER = 1000;
 
+    /**
+     * If the cue is active
+     */
     public enabled = false;
+    /**
+     * Target ball of the cue
+     */
     public target: Ball | null = null;
 
+    /**
+     * Current position of the mouse cursor
+     */
     private mousePos = new Vec2();
+    /**
+     * Coefficient of the hit strength in range [0;1]
+     */
     private strength = 0.5;
 
+    /**
+     * Delegate for when the cue is used
+     */
     public onHit: () => void = () => {};
 
     
@@ -19,6 +41,10 @@ export default class Cue {
         this.setupCanvasObserver(canvas);
     }
 
+    /**
+     * Sets up all the move and hit strength controllers
+     * @param canvas 
+     */
     private setupCanvasObserver(canvas: HTMLCanvasElement) {
         canvas.addEventListener("mousemove", (ev) => {
             const rect = canvas.getBoundingClientRect();
@@ -62,7 +88,10 @@ export default class Cue {
 
 
 
-
+    /**
+     * Draw the cue onto the canvas
+     * @param ctx rendering context
+     */
     public draw(ctx: CanvasRenderingContext2D) {
         if(this.target && this.enabled) {
             const dir = this.directionFromTarget();

@@ -2,6 +2,10 @@ import type Ball from "../Ball";
 import PoolGameState from "../PoolGameState";
 import PoolGameState_RoundConclusion from "./PoolGameState_RoundConclusion";
 
+/**
+ * Class for game's state when balls are moving around
+ * @class PoolGameState_RoundSimulation
+ */
 export default class PoolGameState_RoundSimulation extends PoolGameState {
     private ballsInPockets: Ball[] = [];
 

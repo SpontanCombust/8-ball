@@ -1,14 +1,27 @@
+/**
+ * Abstract base game class
+ * @class Game
+ */
 export default abstract class Game {
     private lastTimestamp: number = 0;
 
-    protected canvas: HTMLCanvasElement;
-    protected ctx: CanvasRenderingContext2D;
+    /**
+     * Instance of the HTML canvas
+     */
+    public canvas: HTMLCanvasElement;
+    /**
+     * Instance of the rendering context
+     */
+    public ctx: CanvasRenderingContext2D;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
     }
 
+    /**
+     * Method that sets up the game loop
+     */
     public start() {
         window.requestAnimationFrame((ts) => this.gameLoop(ts));
     }
@@ -25,6 +38,13 @@ export default abstract class Game {
         window.requestAnimationFrame((ts) => this.gameLoop(ts));
     }
 
+    /**
+     * Method called on every game update
+     * @param dt time since last frame
+     */
     protected abstract onUpdate(dt: number): void;
+    /**
+     * Method called on every game drawing procedure
+     */
     protected abstract onDraw(): void;
 }
